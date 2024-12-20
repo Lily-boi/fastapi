@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Button Sync</title>
+    <script>
+        let ws;
+
+        function connectWebSocket() {
+            ws = new WebSocket("ws://127.0.0.1:8000/ws");
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const button = document.getElementById("syncButton");
+                button.style.backgroundColor = data.color;
+            };
+
+            ws.onclose = function() {
+                console.log("WebSocket connection closed. Reconnecting...");
+                setTimeout(connectWebSocket, 1000); // Attempt reconnect
+            };
+        }
+
+        function toggleButton() {
+            fetch("http://127.0.0.1:8000/toggle_button");
+        }
+
+        window.onload = function() {
+            connectWebSocket();
+        };
+    </script>
+</head>
+<body>
+    <button id="syncButton" onclick="toggleButton()" style="width: 100px; height: 50px; background-color: red;">
+        Click Me
+    </button>
+</body>
+</html>
